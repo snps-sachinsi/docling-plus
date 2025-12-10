@@ -1,6 +1,7 @@
 input/
 output/
 .vscode/
+.artifacts/
 .venv/
 .pytest_cache/
 test_*.py

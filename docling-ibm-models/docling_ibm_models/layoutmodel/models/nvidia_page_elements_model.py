@@ -180,6 +180,8 @@ class NvidiaPageElementsModel(BaseLayoutModel):
             predictions.append(pred)
         
         _log.info(f"NVIDIA Page Elements detection completed ({len(predictions)} pages)")
+        with open("./output/nvidia_page_elements_debug.log", "w") as debug_file:
+            debug_file.write(str(predictions))
         return predictions
     
     def postprocess(
