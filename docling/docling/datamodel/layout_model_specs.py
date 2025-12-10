@@ -85,6 +85,18 @@ NVIDIA_NEMOTRON_PARSE_V11 = LayoutModelConfig(
     ],
 )
 
+# NVIDIA Nemotron Page Elements v3 - Object detection model for document layout
+NVIDIA_PAGE_ELEMENTS_V3 = LayoutModelConfig(
+    name="nvidia_page_elements_v3",
+    repo_id="nvidia/nemotron-page-elements-v3",
+    revision="main",
+    model_path="",
+    supported_devices=[
+        AcceleratorDevice.CPU,
+        AcceleratorDevice.CUDA,
+    ],
+)
+
 # Example for a hypothetical alternative model
 # ALTERNATIVE_LAYOUT = LayoutModelConfig(
 #     name="alternative_layout",
@@ -102,4 +114,5 @@ class LayoutModelType(str, Enum):
     DOCLING_LAYOUT_EGRET_LARGE = "docling_layout_egret_large"
     DOCLING_LAYOUT_EGRET_XLARGE = "docling_layout_egret_xlarge"
     NVIDIA_NEMOTRON_PARSE_V11 = "nvidia_nemotron_parse_v11"
+    NVIDIA_PAGE_ELEMENTS_V3 = "nvidia_page_elements_v3"
     # ALTERNATIVE_LAYOUT = "alternative_layout"

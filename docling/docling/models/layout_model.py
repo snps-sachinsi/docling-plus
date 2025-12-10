@@ -66,7 +66,11 @@ class LayoutModel(BaseLayoutModel):
         _log.info(f"Layout model config name: {layout_model_config.name}")
         
         if "nvidia" in layout_model_config.name.lower() or "nemotron" in layout_model_config.name.lower():
-            model_type = "nvidia_nemo"
+            # Check if it's Page Elements model
+            if "page_element" in layout_model_config.name.lower():
+                model_type = "nvidia_page_elements"
+            else:
+                model_type = "nvidia_nemo"
             # For NVIDIA models, use the repo_id directly for auto-download
             artifacts_path = layout_model_config.repo_id
             _log.info(f"Using NVIDIA model: {model_type}, artifact_path: {artifacts_path}")

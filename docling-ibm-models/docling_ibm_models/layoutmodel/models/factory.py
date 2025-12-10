@@ -39,9 +39,16 @@ class LayoutModelFactory:
             )
             return NvidiaLayoutModel
         
+        def load_nvidia_page_elements_model():
+            from docling_ibm_models.layoutmodel.models.nvidia_page_elements_model import (
+                NvidiaPageElementsModel,
+            )
+            return NvidiaPageElementsModel
+        
         return {
             "docling": load_docling_model,
             "nvidia_nemo": load_nvidia_model,
+            "nvidia_page_elements": load_nvidia_page_elements_model,
         }
     
     @classmethod

@@ -5,6 +5,4 @@ output/
 .pytest_cache/
 test_*.py
 __pycache__/
-nvidia_*.py
-NVIDIA_*
-nvidia_conversion_example.py
+
