@@ -13,7 +13,8 @@ import torch
 from PIL import Image
 from transformers import AutoModelForObjectDetection, RTDetrImageProcessor
 
-from docling_ibm_models.layoutmodel.models.base import ModelConfig, BaseLayoutModel
+from docling_ibm_models.layoutmodel.layoutconfig import ModelConfig
+from docling_ibm_models.layoutmodel.models.base import BaseLayoutModel
 
 _log = logging.getLogger(__name__)
 

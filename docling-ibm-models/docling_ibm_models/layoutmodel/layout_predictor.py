@@ -4,12 +4,13 @@
 #
 import logging
 from collections.abc import Iterable
-from typing import List, Set, Union
+from typing import Dict, List, Optional, Set, Union
 
 import numpy as np
 import torch
 from PIL import Image
 
+from docling_ibm_models.layoutmodel.layoutconfig import get_model_config
 from docling_ibm_models.layoutmodel.models.factory import LayoutModelFactory
 from docling_ibm_models.layoutmodel.models.postprocessing import (
     DetectionPostProcessor,
@@ -35,6 +36,7 @@ class LayoutPredictor:
         base_threshold: float = 0.3,
         blacklist_classes: Set[str] = set(),
         model_type: str = "docling",
+        model_config: Optional[Dict[str, any]] = None,
     ):
         """
         Provide the artifact path that contains the LayoutModel file
@@ -48,16 +50,38 @@ class LayoutPredictor:
         blacklist_classes: (Optional) classes to filter out from predictions
         model_type: (Optional) layout model type to use (default: "docling")
                     Options: "docling", "nvidia_nemo", or custom registered types
+        model_config: (Optional) configuration dict to override defaults for this model.
+                     If provided, explicit params (device, num_threads, etc.) are ignored.
+                     Config keys: device, num_threads, threshold, blacklist_classes, etc.
 
         Raises
         ------
         FileNotFoundError when the model's files are missing
         ValueError when model_type is not supported
         """
+        # If model_config not provided, build from explicit parameters
+        if model_config is None:
+            model_config = {
+                "device": device,
+                "num_threads": num_threads,
+                "threshold": base_threshold,
+                "blacklist_classes": blacklist_classes,
+            }
+        
+        # Get merged config (defaults + model-specific + user)
+        merged_config = get_model_config(model_type=model_type, user_config=model_config)
+        
+        # Extract final values
+        final_device = merged_config.get("device", "cpu")
+        final_num_threads = merged_config.get("num_threads", 4)
+        final_threshold = merged_config.get("threshold", 0.3)
+        final_blacklist = merged_config.get("blacklist_classes", set())
+        
         # Store parameters
-        self._black_classes = blacklist_classes
-        self._threshold = base_threshold
-        self._device = torch.device(device)
+        self._black_classes = final_blacklist
+        self._threshold = final_threshold
+        self._device = torch.device(final_device)
+        self._model_config = merged_config
         
         # Canonical classes
         self._labels = LayoutLabels()
@@ -66,10 +90,11 @@ class LayoutPredictor:
         self._model = LayoutModelFactory.create_model(
             model_type=model_type,
             artifact_path=artifact_path,
-            device=device,
-            num_threads=num_threads,
-            threshold=base_threshold,
-            blacklist_classes=blacklist_classes,
+            device=final_device,
+            num_threads=final_num_threads,
+            threshold=final_threshold,
+            blacklist_classes=final_blacklist,
+            model_config=merged_config,  # Pass full config to factory for underlying modules
         )
         
         # Get label offset and classes map from model
@@ -93,6 +118,7 @@ class LayoutPredictor:
             "device": self._device.type,
             "threshold": self._threshold,
             "label_offset": self._label_offset,
+            "model_config": self._model_config,
         }
         info.update(model_info)
         return info

@@ -89,11 +89,15 @@ class LayoutModel(BaseLayoutModel):
                 )
                 artifacts_path = artifacts_path / model_path
 
+        # Get model config from options if provided
+        model_config = getattr(options, 'layout_model_config', None)
+
         self.layout_predictor = LayoutPredictor(
             artifact_path=str(artifacts_path),
             device=device,
             num_threads=accelerator_options.num_threads,
             model_type=model_type,
+            model_config=model_config,
         )
 
     @classmethod

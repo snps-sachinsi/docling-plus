@@ -5,48 +5,12 @@
 """Base interfaces for layout detection models."""
 
 from abc import ABC, abstractmethod
-from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional, Set, Tuple
+from typing import Any, Dict, List, Tuple
 
 import torch
 from PIL import Image
 
-
-@dataclass
-class ModelConfig:
-    """Configuration for layout detection model.
-    
-    Parameters
-    ----------
-    model_type : str
-        Type of layout model to use (e.g., "docling", "nvidia_nemo", "custom")
-    artifact_path : str
-        Path to model artifacts directory
-    device : str
-        Device to run inference on ("cpu", "cuda", "mps")
-    num_threads : int
-        Number of threads for CPU inference
-    threshold : float
-        Confidence threshold for predictions
-    blacklist_classes : Set[str]
-        Classes to filter out from predictions
-    requires_label_offset : Optional[bool]
-        Whether model requires label offset (auto-detected if None)
-    image_size : Optional[Tuple[int, int]]
-        Target image size for preprocessing (auto-detected if None)
-    model_specific_params : Dict[str, Any]
-        Additional model-specific parameters
-    """
-    
-    model_type: str = "docling"
-    artifact_path: str = ""
-    device: str = "cpu"
-    num_threads: int = 4
-    threshold: float = 0.3
-    blacklist_classes: Set[str] = field(default_factory=set)
-    requires_label_offset: Optional[bool] = None
-    image_size: Optional[Tuple[int, int]] = None
-    model_specific_params: Dict[str, Any] = field(default_factory=dict)
+from docling_ibm_models.layoutmodel.layoutconfig import ModelConfig
 
 
 class BaseLayoutModel(ABC):

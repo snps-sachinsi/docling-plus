@@ -5,9 +5,10 @@
 """Factory for creating layout detection model instances."""
 
 import logging
-from typing import Callable, Dict, Type, Union
+from typing import Callable, Dict, Optional, Type, Union, Any
 
-from docling_ibm_models.layoutmodel.models.base import ModelConfig, BaseLayoutModel
+from docling_ibm_models.layoutmodel.layoutconfig import ModelConfig, create_model_config
+from docling_ibm_models.layoutmodel.models.base import BaseLayoutModel
 
 _log = logging.getLogger(__name__)
 
@@ -67,6 +68,7 @@ class LayoutModelFactory:
         device: str = "cpu",
         num_threads: int = 4,
         threshold: float = 0.3,
+        model_config: Optional[Dict[str, Any]] = None,
         **kwargs,
     ) -> BaseLayoutModel:
         """Create a layout detection model instance.
@@ -75,17 +77,18 @@ class LayoutModelFactory:
         ----------
         model_type : str, optional
             Type of model to create, by default "docling"
-            Options: "docling", "nvidia_nemo", or custom registered types
         artifact_path : str, optional
             Path to model artifacts, by default ""
         device : str, optional
-            Device for inference, by default "cpu"
+            Device for inference (overridden by model_config if provided)
         num_threads : int, optional
-            Number of CPU threads, by default 4
+            Number of CPU threads (overridden by model_config if provided)
         threshold : float, optional
-            Confidence threshold, by default 0.3
+            Confidence threshold (overridden by model_config if provided)
+        model_config : Optional[Dict[str, Any]], optional
+            User configuration dict that merges with model defaults
         **kwargs
-            Additional parameters passed to ModelConfig
+            Additional legacy parameters
         
         Returns
         -------
@@ -107,14 +110,20 @@ class LayoutModelFactory:
                 f"Available models: {available}"
             )
         
-        # Create configuration
-        config = ModelConfig(
+        # If model_config is provided, use it; otherwise use explicit params
+        if model_config is None:
+            # Build config from explicit parameters
+            model_config = {
+                "device": device,
+                "num_threads": num_threads,
+                "threshold": threshold,
+            }
+        
+        # Create configuration using the simplified API
+        config = create_model_config(
             model_type=model_type,
             artifact_path=artifact_path,
-            device=device,
-            num_threads=num_threads,
-            threshold=threshold,
-            **kwargs,
+            user_config=model_config,
         )
         
         # Get model class (may be callable for lazy loading)

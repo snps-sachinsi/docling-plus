@@ -330,6 +330,7 @@ class LayoutOptions(BaseLayoutOptions):
     kind: ClassVar[str] = "docling_layout_default"
     create_orphan_clusters: bool = True  # Whether to create clusters for orphaned cells
     model_spec: LayoutModelConfig = DOCLING_LAYOUT_HERON
+    layout_model_config: Optional[Dict[str, Any]] = None  # User config to override model defaults
 
 
 class AsrPipelineOptions(PipelineOptions):
